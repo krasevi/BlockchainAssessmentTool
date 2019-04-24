@@ -4,7 +4,7 @@ from github import Github
 
 # Attention always delete password before committing
 # ------------------------------------------------------------------------------
-g = Github("krasevi", "xx")
+g = Github("krasevi", "xxx")
 # or using an access token
 # g = Github("access_token")
 # Github Enterprise with custom hostname
@@ -19,17 +19,35 @@ g = Github("krasevi", "xx")
     # print(dir(repo))
 
 # define repository
-repo = g.get_repo("NebulousLabs/Sia")
+repo = g.get_repo("krasevi/BlockchainAssessmentTool")
+
 
 # stars
-print(repo.stargazers_count)
+starCount = repo.stargazers_count
+print(starCount)
 
 # commits
-print(repo.get_commits().totalCount)
+commits = repo.get_commits()
+commitCount = commits.totalCount
+print(commitCount)
 
 # events
-print(repo.get_events().totalCount)
+events = repo.get_events()
+eventCount = events.totalCount
+print(eventCount)
 
+# forks
+forks = repo.get_forks()
+forkCount = forks.totalCount
+print(forkCount)
+
+# stats
+stats = repo.get_stats_code_frequency()
+code_frequency = list(stats)
+additions = code_frequency[-1].additions
+deletions = code_frequency[-1].deletions
+week = code_frequency[-1].week
+print (additions, deletions, week)
 
 # number of contributors
 contributors = repo.get_contributors()
@@ -37,6 +55,3 @@ contributor_list = []
 for contributor in contributors:
     contributors = contributor_list.append(contributor.name)
 print(len(contributor_list))
-
-
-# topics
