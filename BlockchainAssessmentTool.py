@@ -7,23 +7,28 @@
 # 1. install pyGithub by using "pip install pyGithub" in the command line
 
 from github import Github
-import datetime
 
 # ******************************************************************************
 # settings
 # ******************************************************************************
 
 # using username and password
-# Attention always delete password before committing to GitHub
-g = Github("krasevi", "xxx")
+myuser = input("enter github username: ")
+mypassword = input("enter github password: ")
+
+g = Github(myuser, mypassword)
 # or using an access token
 # g = Github("access_token")
 # Github Enterprise with custom hostname
-# g = Github(base_url="https://{hostname}/api/v3", login_or_token="access_token")
+# g = Github(base_url="https://{hostname}/api/v3", login_or_token="token")
+
 # repository
 repositoryName = "input-output-hk/rust-cardano"
+
 # active developer definition
+# define number of minimum contributions of a developer to be considered active
 minContributions = 50
+# define time frame in which the developer made his last commit (to be active)
 activeDevDays = 30
 
 # ******************************************************************************
@@ -46,8 +51,8 @@ print("events: " + str(events_totalCount))
 forks = repo.get_forks()
 forks_count = repo.forks_count
 forks_totalCount = forks.totalCount
-print("forks: "+ str(forks_count))
-print("forks: "+ str(forks_totalCount))
+print("forks: " + str(forks_count))
+print("forks: " + str(forks_totalCount))
 
 # commits
 commits = repo.get_commits()
@@ -87,9 +92,9 @@ print("number of contributors: " + str(contributor_totalCount))
 commit_activity_stats = repo.get_stats_commit_activity()
 commit_activity_list_week = []
 commit_activity_list_days = []
-for StatsCommitActivity in commit_activity_stats:
-    commit_activity_stats = commit_activity_list_week.append(StatsCommitActivity.total)
-    commit_activity_stats = commit_activity_list_days.append(StatsCommitActivity.days)
+for commitStats in commit_activity_stats:
+    commit_activity_stats = commit_activity_list_week.append(commitStats.total)
+    commit_activity_stats = commit_activity_list_days.append(commitStats.days)
 
 # commit_activity last week
 print("commit activity last week: " + str(commit_activity_list_week[-1]))
@@ -120,60 +125,6 @@ month = [-1, -2, -3, -4]
 additions_month = sum(int(code_frequency[i].additions) for i in month)
 deletions_month = sum(int(code_frequency[i].deletions) for i in month)
 changes_month = abs(additions_month) + abs(deletions_month)
-print(additions_month, deletions_month, changes_month)
 print("additions last month: " + str(additions_month))
 print("deletions last month: " + str(deletions_month))
 print("changes last month: " + str(changes_month))
-
-
-# ******************************************************************************
-# 2. statistics for active developers
-# ******************************************************************************
-
-# define active developers per repository
-
-# active developers that fulfill minimum number of commits
-activeDevs = []
-for i in range(contributor_totalCount):
-    if int(contributions_list[i]) > minContributions:
-        activeDevs.append(contributor_list[i])
-        i += 1
-    else:
-        i += 1
-
-# get commits to the repo
-commits = repo.get_commits()
-
-# get active developers that commited in a certain time frame
-activeDevsInPeriod = []
-commit_author_names = []
-activeDevsInPeriod_logins = []
-
-for commit in commits:
-    # check if developer is already in the list
-    if commit.commit.author.name not in activeDevsInPeriod:
-        # sort out empty commits
-        if commit.commit is not None:
-            # sort out commits older than x days
-            if commit.commit.author.date >= (datetime.datetime.now()- datetime.timedelta(days=activeDevDays)):
-                commit_author_names.append(commit.commit.author.name)
-                # sort out devs that do not fulfull minimum number of commits
-                if commit.commit.author.name in activeDevs:
-                    activeDevsInPeriod.append(commit.commit.author.name)
-                    activeDevsInPeriod_logins.append(commit.author.login)
-    else:
-        pass
-print("active Developers: " + str(activeDevsInPeriod_logins))
-
-
-i = 0
-for i in range(len(activeDevsInPeriod_logins)):
-    dev = activeDevsInPeriod_logins[i]
-    user = g.get_user(dev)
-    print("Name activeDev: " + str(user.name))
-    print("Number of repos of dev: " + str(user.public_repos))
-    print("Number of followers of dev: " + str(user.followers))
-    print("Number of repos following: " + str(user.following))
-    i += 1
-
-#     print(username.id)
