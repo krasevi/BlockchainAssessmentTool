@@ -132,7 +132,7 @@ print("changes last month: " + str(changes_month))
 
 # define active developers per repository
 
-# active developers
+# active developers that fulfill minimum number of commits
 activeDevs = []
 for i in range(contributor_totalCount):
     if int(contributions_list[i]) > minContributions:
@@ -141,33 +141,39 @@ for i in range(contributor_totalCount):
     else:
         i += 1
 
-# for i in range(activeDevs)
-# commits to a repo
+# get commits to the repo
 commits = repo.get_commits()
-# commits_sha_list = []
-commit_author_dates = []
-commit_author_names = []
 
+# get active developers that commited in a certain time frame
 activeDevsInPeriod = []
+commit_author_names = []
+activeDevsInPeriod_logins = []
 
 for commit in commits:
+    # check if developer is already in the list
     if commit.commit.author.name not in activeDevsInPeriod:
+        # sort out empty commits
         if commit.commit is not None:
+            # sort out commits older than x days
             if commit.commit.author.date >= (datetime.datetime.now()- datetime.timedelta(days=activeDevDays)):
                 commit_author_names.append(commit.commit.author.name)
+                # sort out devs that do not fulfull minimum number of commits
                 if commit.commit.author.name in activeDevs:
                     activeDevsInPeriod.append(commit.commit.author.name)
+                    activeDevsInPeriod_logins.append(commit.author.login)
     else:
         pass
-print("active Developers: " + str(activeDevsInPeriod))
+print("active Developers: " + str(activeDevsInPeriod_logins))
 
-        # if commit.commit.author.date >= (datetime.datetime.now()- datetime.timedelta(days=1)):
-        #    commit_author_dates.append(commit.commit.author.date)
-        #    commit_author_names.append(commit.commit.author.name)
-        #    commit_author_id.append(commit.commit.author.id)
 
-# print(commit_author_dates)
-#     commits_sha_list.append(commit.sha)
-# print("commits to repo: " +str(len(commits_sha_list)))
+i = 0
+for i in range(len(activeDevsInPeriod_logins)):
+    dev = activeDevsInPeriod_logins[i]
+    user = g.get_user(dev)
+    print("Name activeDev: " + str(user.name))
+    print("Number of repos of dev: " + str(user.public_repos))
+    print("Number of followers of dev: " + str(user.followers))
+    print("Number of repos following: " + str(user.following))
+    i += 1
 
-# print("active developer ids: " + str(activeDevs))
+#     print(username.id)
