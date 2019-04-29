@@ -7,6 +7,7 @@
 # 1. install pyGithub by using "pip install pyGithub" in the command line
 
 from github import Github
+import datetime
 
 # ******************************************************************************
 # settings
@@ -20,9 +21,10 @@ g = Github("krasevi", "xxx")
 # Github Enterprise with custom hostname
 # g = Github(base_url="https://{hostname}/api/v3", login_or_token="access_token")
 # repository
-repositoryName = "NebulousLabs/Sia"
+repositoryName = "input-output-hk/rust-cardano"
 # active developer definition
-activeDevContributions = 50
+minContributions = 50
+activeDevDays = 30
 
 # ******************************************************************************
 # 1. Statistics per repository
@@ -52,13 +54,6 @@ commits = repo.get_commits()
 commit_totalCount = commits.totalCount
 print("commits: " + str(commit_totalCount))
 
-# commits to a repo
-# commits = repo.get_commits()
-# commits_sha_list = []
-# for commit in commits:
-#     commits_sha_list.append(commit.sha)
-# print("commits to repo: " +str(len(commits_sha_list)))
-
 # watchers
 watchers_count = repo.watchers_count
 watchers = repo.get_subscribers()
@@ -80,10 +75,10 @@ contributor_list = []
 contributions_list = []
 
 for contributor in contributors:
-    contributor_list.append(contributor.id)
+    contributor_list.append(contributor.name)
     contributions_list.append(contributor.contributions)
 contributor_totalCount = len(contributor_list)
-print("number of contributors: "+ str(contributor_totalCount))
+print("number of contributors: " + str(contributor_totalCount))
 
 
 # commit_activity
@@ -118,7 +113,7 @@ deletions_week = int(code_frequency[-1].deletions)
 changes_week = abs(additions_week)+abs(deletions_week)
 print("additions last week: " + str(additions_week))
 print("deletions last week: " + str(deletions_week))
-print("changes last week: "+ str(changes_week))
+print("changes last week: " + str(changes_week))
 
 #  code_frequency in the last month
 month = [-1, -2, -3, -4]
@@ -140,9 +135,39 @@ print("changes last month: " + str(changes_month))
 # active developers
 activeDevs = []
 for i in range(contributor_totalCount):
-    if int(contributions_list[i]) > activeDevContributions:
+    if int(contributions_list[i]) > minContributions:
         activeDevs.append(contributor_list[i])
         i += 1
     else:
         i += 1
-print("active developer ids: " + str(activeDevs))
+
+# for i in range(activeDevs)
+# commits to a repo
+commits = repo.get_commits()
+# commits_sha_list = []
+commit_author_dates = []
+commit_author_names = []
+
+activeDevsInPeriod = []
+
+for commit in commits:
+    if commit.commit.author.name not in activeDevsInPeriod:
+        if commit.commit is not None:
+            if commit.commit.author.date >= (datetime.datetime.now()- datetime.timedelta(days=activeDevDays)):
+                commit_author_names.append(commit.commit.author.name)
+                if commit.commit.author.name in activeDevs:
+                    activeDevsInPeriod.append(commit.commit.author.name)
+    else:
+        pass
+print("active Developers: " + str(activeDevsInPeriod))
+
+        # if commit.commit.author.date >= (datetime.datetime.now()- datetime.timedelta(days=1)):
+        #    commit_author_dates.append(commit.commit.author.date)
+        #    commit_author_names.append(commit.commit.author.name)
+        #    commit_author_id.append(commit.commit.author.id)
+
+# print(commit_author_dates)
+#     commits_sha_list.append(commit.sha)
+# print("commits to repo: " +str(len(commits_sha_list)))
+
+# print("active developer ids: " + str(activeDevs))
