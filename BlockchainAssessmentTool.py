@@ -39,46 +39,36 @@ activeDevDays = 30
 
 # define repository
 repo = g.get_repo(repositoryName)
-
 # stars
 stars_totalCount = repo.stargazers_count
-
 # events
 events = repo.get_events()
 events_totalCount = events.totalCount
-
 # forks
 forks = repo.get_forks()
 forks_count = repo.forks_count
 forks_totalCount = forks.totalCount
-
 # commits
 commits = repo.get_commits()
 commit_totalCount = commits.totalCount
-
 # watchers
 watchers_count = repo.watchers_count
 watchers = repo.get_subscribers()
 watchers_totalCount = watchers.totalCount
-
-
 # number of pull requests
 pulls = repo.get_pulls()
 pulls_numbers_list = []
 for pull in pulls:
     pulls_numbers_list.append(pull.number)
 pulls_totalCount = len(pulls_numbers_list)
-
 # number of contributors
 contributors = repo.get_contributors()
 contributor_list = []
 contributions_list = []
-
 for contributor in contributors:
     contributor_list.append(contributor.name)
     contributions_list.append(contributor.contributions)
 contributor_totalCount = len(contributor_list)
-
 # commit_activity
 # Get the last year of commit activity data grouped by week
 # probably only commits by owners are counted - tbd
@@ -88,26 +78,21 @@ commit_activity_list_days = []
 for commitStats in commit_activity_stats:
     commit_activity_stats = commit_activity_list_week.append(commitStats.total)
     commit_activity_stats = commit_activity_list_days.append(commitStats.days)
-
 # commit_activity last week
 commit_activity_week = commit_activity_list_week[-1]
 commit_activity_days = commit_activity_list_days[-1]
-
 # commit_activity last changes_month
 month = [-1, -2, -3, -4]
 commit_activity_month = sum(int(commit_activity_list_week[i]) for i in month)
-
 # code_frequency
 # Get the number of additions and deletions per week
 # probably only gets code frequency of owners - tbd
 code_frequency = list(repo.get_stats_code_frequency())
-
 # code_frequency in the last week
 week = code_frequency[-1].week
 additions_week = int(code_frequency[-1].additions)
 deletions_week = int(code_frequency[-1].deletions)
 changes_week = abs(additions_week)+abs(deletions_week)
-
 # code_frequency in the last month
 month = [-1, -2, -3, -4]
 additions_month = sum(int(code_frequency[i].additions) for i in month)
@@ -115,10 +100,18 @@ deletions_month = sum(int(code_frequency[i].deletions) for i in month)
 changes_month = abs(additions_month) + abs(deletions_month)
 
 def csvPrint():
-    with open('repo_stats.csv', mode='w', newline='') as repo_stats:
-        repo_stats = csv.writer(repo_stats, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        repo_stats.writerow(['repositoryName', 'stars', 'events', 'forks', 'commits', 'watchers','pulls','number of contributors','commit activity last week','commit activity daily','commit activity last month','additions last week','deletions last week','changes last week','additions last month','deletions last month','changes last month'])
-        repo_stats.writerow([repositoryName, stars_totalCount, events_totalCount, forks_count, commit_totalCount, watchers_totalCount, pulls_totalCount, contributor_totalCount, commit_activity_week, commit_activity_days, commit_activity_month, additions_week, deletions_week,changes_week, additions_month, deletions_month,changes_month])
+
+#does not work yet
+    with open('input.csv') as input_file:
+        input_file = csv.reader(input_file, delimiter=',')
+        row_lines = []
+        for row in input_file:
+            repositoryName = str(((f'\t{row[0]}')))
+            print(repositoryName)
+            with open('output.csv', mode='w', newline='') as output:
+                output = csv.writer(output, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                output.writerow(['repositoryName', 'stars', 'events', 'forks', 'commits', 'watchers','pulls','number of contributors','commit activity last week','commit activity daily','commit activity last month','additions last week','deletions last week','changes last week','additions last month','deletions last month','changes last month'])
+                output.writerow([repositoryName, stars_totalCount, events_totalCount, forks_count, commit_totalCount, watchers_totalCount, pulls_totalCount, contributor_totalCount, commit_activity_week, commit_activity_days, commit_activity_month, additions_week, deletions_week,changes_week, additions_month, deletions_month,changes_month])
 
 def pythonPrint():
     print("stars: " + str(stars_totalCount))
@@ -139,6 +132,10 @@ def pythonPrint():
     print("additions last month: " + str(additions_month))
     print("deletions last month: " + str(deletions_month))
     print("changes last month: " + str(changes_month))
+
+
+
+
 
 csvPrint()
 pythonPrint()
